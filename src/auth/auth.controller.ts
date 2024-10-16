@@ -1,9 +1,13 @@
-import { Controller, Post, Body, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Get, UseGuards } from '@nestjs/common';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { catchError } from 'rxjs';
+
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { LoginDto } from './dto/login-auth.dto';
-import { catchError } from 'rxjs';
+import { User, Token } from './decorators';
+import { UserInterface } from './interfaces/user.interfaces';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +17,7 @@ export class AuthController {
 
   @Post('register')
   create(@Body() createAuthDto: CreateAuthDto) {
-    return this.client.send('register', createAuthDto).pipe(
+    return this.client.send('auth.register.user', createAuthDto).pipe(
       catchError((err) => {
         console.log('Error :D', err);
         throw new RpcException(err);
@@ -23,10 +27,15 @@ export class AuthController {
 
   @Post('login')
   login(@Body() login: LoginDto) {
-    return this.client.send('login', login).pipe(
+    return this.client.send('auth.login.user', login).pipe(
       catchError((err) => {
         throw new RpcException(err);
       }),
     );
+  }
+  @UseGuards(AuthGuard)
+  @Get('verify')
+  verifyToken(@User() user: UserInterface, @Token() token: string) {
+    return { user, token };
   }
 }
