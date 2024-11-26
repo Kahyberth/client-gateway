@@ -17,26 +17,26 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const request = context.switchToHttp().getRequest<Request>();
+
+    const token = this.extractTokenFromCookies(request);
     if (!token) {
       throw new UnauthorizedException();
     }
     try {
-      const { user, token: newToken } = await firstValueFrom(
+      const { user } = await firstValueFrom(
         this.client.send('auth.verify.user', token),
       );
 
       request['user'] = user;
-      request['token'] = newToken;
+      request['token'] = token;
     } catch {
       throw new UnauthorizedException();
     }
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+  private extractTokenFromCookies(request: Request): string | undefined {
+    return request.cookies?.['token'];
   }
 }
