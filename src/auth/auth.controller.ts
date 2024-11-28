@@ -7,6 +7,8 @@ import {
   UseGuards,
   Res,
   HttpStatus,
+  Query,
+  Param,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { firstValueFrom, catchError } from 'rxjs';
@@ -77,5 +79,21 @@ export class AuthController {
       path: '/',
     });
     return res.status(HttpStatus.OK).json({ success: true });
+  }
+
+  @Post('find/:token')
+  async findUser(@Param('token') token: string) {
+    token = token.split('=')[1];
+    const user = await firstValueFrom(
+      this.client.send('auth.get.user', token).pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      ),
+    );
+    if (!user) {
+      throw new RpcException('User not found');
+    }
+    return user;
   }
 }

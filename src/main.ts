@@ -7,11 +7,18 @@ import { ExceptionFilter } from './common/exceptions/rpc-exception.filter';
 import { envs } from './common/envs/envs';
 
 async function bootstrap() {
+  const allowedOrigins = envs.CORS_ORIGIN.split(',');
   const logger = new Logger('Main-gateway');
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: envs.CORS_ORIGIN,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
   app.useGlobalPipes(
