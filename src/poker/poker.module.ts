@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import { PokerController } from './poker.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { envs } from '../common/envs/envs';
+import { NATS_SERVICE } from '../common/enums/service.enums';
 
 @Module({
   controllers: [PokerController],
-  providers: [AuthGuard],
+  providers: [],
   imports: [
     ClientsModule.register([
       {
         name: NATS_SERVICE.NATS_SERVICE,
         transport: Transport.NATS,
         options: {
-          servers: ['nats://localhost:4222'],
+          servers: envs.NATS_SERVERS,
         },
       },
     ]),

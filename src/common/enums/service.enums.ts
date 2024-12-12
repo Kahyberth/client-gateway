@@ -5,3 +5,7 @@ export enum NATS_SERVICE {
 export enum AUTH_SERVICE {
   AUTH_SERVICE = 'AUTH_SERVICE',
 }
+
+export enum POKER_SERVICE {
+  POKER_SERVICE = 'POKER_SERVICE',
+}
