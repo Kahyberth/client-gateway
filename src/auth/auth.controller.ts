@@ -19,6 +19,7 @@ import { LoginDto } from './dto/login-auth.dto';
 import { User } from './decorators';
 import { UserInterface } from './interfaces/user.interfaces';
 import { AuthGuard } from './guards/auth.guard';
+import { CreateTeamDto } from './dto/create-team-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -56,7 +57,7 @@ export class AuthController {
         path: '/',
       });
 
-      return res.status(HttpStatus.OK).json({ success: true });
+      return res.status(HttpStatus.OK).json({ data: result.data, token });
     } catch (error) {
       return res
         .status(HttpStatus.UNAUTHORIZED)
@@ -111,5 +112,31 @@ export class AuthController {
       throw new RpcException('User not found');
     }
     return user;
+  }
+
+  //Teams
+
+  @Post('create-team')
+  async createTeam(@Body() team: CreateTeamDto) {
+    const result = await firstValueFrom(
+      this.client.send('auth.create.team', team).pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      ),
+    );
+    return result;
+  }
+
+  @Get('get-all-teams')
+  async getAllTeams() {
+    const result = await firstValueFrom(
+      this.client.send('auth.get.all.teams', {}).pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      ),
+    );
+    return result;
   }
 }

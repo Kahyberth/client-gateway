@@ -28,7 +28,7 @@ export class PokerController {
 
   @Get('all-sessions')
   getAllRooms() {
-    return this.client.send('poker.get.session', {}).pipe(
+    return this.client.send('poker.get.all.session', {}).pipe(
       catchError((err) => {
         throw new RpcException(err);
       }),
