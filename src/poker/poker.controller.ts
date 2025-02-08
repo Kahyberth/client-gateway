@@ -19,6 +19,7 @@ export class PokerController {
 
   @Post('create-session')
   create(@Body() createPokerDto: CreatePokerDto) {
+    console.log('Data received:', createPokerDto);
     return this.client.send('poker.create.session', createPokerDto).pipe(
       catchError((err) => {
         throw new RpcException(err);
@@ -53,7 +54,11 @@ export class PokerController {
   join(@Body() data: any) {
     return this.client.send('poker.join.session', data).pipe(
       catchError((err) => {
-        throw new RpcException(err);
+        console.error('Error from microservice:', err);
+        throw new BadRequestException({
+          message: err?.error || 'An error occurred',
+          statusCode: err?.code || 400,
+        });
       }),
     );
   }
@@ -65,6 +70,36 @@ export class PokerController {
         throw new RpcException(err);
       }),
     );
+  }
+
+  @Get('stories')
+  findAll() {
+    return [
+      {
+        id: 1,
+        title: 'Implement user authentication',
+        description: 'As a user, I want to be able to securely log in ...',
+        priority: 'High',
+      },
+      {
+        id: 2,
+        title: 'Create dashboard layout',
+        description: 'As a user, I want to see a clear overview ...',
+        priority: 'Medium',
+      },
+      {
+        id: 3,
+        title: 'Login page design',
+        description: 'As a user, I want to see a beautiful login page ...',
+        priority: 'Low',
+      },
+      {
+        id: 4,
+        title: 'Manage user roles',
+        description: 'As an admin, I want to be able to manage user roles ...',
+        priority: 'High',
+      },
+    ];
   }
 
   @Get('ping')

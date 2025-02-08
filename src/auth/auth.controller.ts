@@ -98,6 +98,23 @@ export class AuthController {
     return user;
   }
 
+  @Get('find/user/:id')
+  async findUserById(@Param('id') id: string) {
+    if (!id) throw new RpcException('Id is required');
+
+    const user = await firstValueFrom(
+      this.client.send('auth.find.user.by.id', id).pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      ),
+    );
+    if (!user) {
+      throw new RpcException('User not found');
+    }
+    return user;
+  }
+
   @Post('find/:token')
   async findUser(@Param('token') token: string) {
     token = token.split('=')[1];
