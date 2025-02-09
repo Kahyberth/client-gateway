@@ -67,7 +67,11 @@ export class PokerController {
   joinByCode(@Body() data: any) {
     return this.client.send('poker.join.session.code', data).pipe(
       catchError((err) => {
-        throw new RpcException(err);
+        console.error('Error from microservice:', err);
+        throw new BadRequestException({
+          message: err?.error || 'An error occurred',
+          statusCode: err?.code || 400,
+        });
       }),
     );
   }
