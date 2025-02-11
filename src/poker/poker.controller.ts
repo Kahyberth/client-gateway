@@ -10,6 +10,7 @@ import { CreatePokerDto } from './dto/create-poker.dto';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
+import { ValidateSession } from './dto/validate-session.dto';
 
 @Controller('poker')
 export class PokerController {
@@ -36,10 +37,10 @@ export class PokerController {
     );
   }
 
-  @Post('verify-user')
-  verifyUser(@Body() data: any) {
+  @Post('validate-session')
+  verifyUser(@Body() data: ValidateSession) {
     console.log('Data received:', data);
-    return this.client.send('poker.verify.user', data).pipe(
+    return this.client.send('poker.validate.session', data).pipe(
       catchError((err) => {
         console.error('Error from microservice:', err);
         throw new BadRequestException({
