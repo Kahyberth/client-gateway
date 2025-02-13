@@ -77,6 +77,20 @@ export class PokerController {
     );
   }
 
+  //MagicLink
+  @Post('magic-link')
+  magicLink(@Body() data: any) {
+    return this.client.send('poker.join.magic.link', data).pipe(
+      catchError((err) => {
+        console.error('Error from microservice:', err);
+        throw new BadRequestException({
+          message: err?.error || 'An error occurred',
+          statusCode: err?.code || 400,
+        });
+      }),
+    );
+  }
+
   @Get('stories')
   findAll() {
     return [
