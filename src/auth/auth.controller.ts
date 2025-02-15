@@ -19,7 +19,6 @@ import { LoginDto } from './dto/login-auth.dto';
 import { User } from './decorators';
 import { UserInterface } from './interfaces/user.interfaces';
 import { AuthGuard } from './guards/auth.guard';
-import { CreateTeamDto } from './dto/create-team-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -68,6 +67,21 @@ export class AuthController {
   @Get('verify')
   verifyToken(@User() user: UserInterface) {
     return { user };
+  }
+
+  @Get('profile/:id')
+  async profile(@Param('id') id: string) {
+    const profile = await firstValueFrom(
+      this.client.send('auth.get.profile', id).pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      ),
+    );
+    if (!profile) {
+      throw new RpcException('User not found');
+    }
+    return profile;
   }
 
   @Post('logout')
@@ -131,29 +145,26 @@ export class AuthController {
     return user;
   }
 
-  //Teams
-
-  @Post('create-team')
-  async createTeam(@Body() team: CreateTeamDto) {
+  @Post('refresh-token')
+  async refreshToken(
+    @Body() body: { refreshToken: string },
+    @Res() res: Response,
+  ) {
     const result = await firstValueFrom(
-      this.client.send('auth.create.team', team).pipe(
+      this.client.send('auth.refresh.token', body).pipe(
         catchError((err) => {
           throw new RpcException(err);
         }),
       ),
     );
-    return result;
-  }
+    const { accessToken, refreshToken } = result;
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-  @Get('get-all-teams')
-  async getAllTeams() {
-    const result = await firstValueFrom(
-      this.client.send('auth.get.all.teams', {}).pipe(
-        catchError((err) => {
-          throw new RpcException(err);
-        }),
-      ),
-    );
-    return result;
+    return res.status(HttpStatus.OK).json({ accessToken, refreshToken });
   }
 }
