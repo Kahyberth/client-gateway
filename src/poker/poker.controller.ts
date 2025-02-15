@@ -5,12 +5,14 @@ import {
   Inject,
   Get,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { CreatePokerDto } from './dto/create-poker.dto';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
 import { ValidateSession } from './dto/validate-session.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('poker')
 export class PokerController {
@@ -18,6 +20,7 @@ export class PokerController {
     @Inject(NATS_SERVICE.NATS_SERVICE) private readonly client: ClientProxy,
   ) {}
 
+  @UseGuards(AuthGuard)
   @Post('create-session')
   create(@Body() createPokerDto: CreatePokerDto) {
     console.log('Data received:', createPokerDto);
@@ -28,6 +31,7 @@ export class PokerController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Get('all-sessions')
   getAllRooms() {
     return this.client.send('poker.get.all.session', {}).pipe(
@@ -37,6 +41,7 @@ export class PokerController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Post('validate-session')
   verifyUser(@Body() data: ValidateSession) {
     console.log('Data received:', data);
@@ -51,6 +56,7 @@ export class PokerController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Post('join-session')
   join(@Body() data: any) {
     return this.client.send('poker.join.session', data).pipe(
@@ -64,6 +70,7 @@ export class PokerController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Post('join-session-code')
   joinByCode(@Body() data: any) {
     return this.client.send('poker.join.session.code', data).pipe(

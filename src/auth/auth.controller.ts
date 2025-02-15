@@ -69,6 +69,7 @@ export class AuthController {
     return { user };
   }
 
+  @UseGuards(AuthGuard)
   @Get('profile/:id')
   async profile(@Param('id') id: string) {
     const profile = await firstValueFrom(
@@ -84,6 +85,7 @@ export class AuthController {
     return profile;
   }
 
+  @UseGuards(AuthGuard)
   @Post('logout')
   logout(@Res() res: Response) {
     res.clearCookie('token', {
@@ -95,6 +97,7 @@ export class AuthController {
     return res.status(HttpStatus.OK).json({ success: true });
   }
 
+  @UseGuards(AuthGuard)
   @Get('find/:email')
   async findUserByEmail(@Param('email') email: string) {
     if (!email) throw new RpcException('Email is required');
@@ -112,6 +115,7 @@ export class AuthController {
     return user;
   }
 
+  @UseGuards(AuthGuard)
   @Get('find/user/:id')
   async findUserById(@Param('id') id: string) {
     if (!id) throw new RpcException('Id is required');
@@ -129,6 +133,7 @@ export class AuthController {
     return user;
   }
 
+  @UseGuards(AuthGuard)
   @Post('find/:token')
   async findUser(@Param('token') token: string) {
     token = token.split('=')[1];

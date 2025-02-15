@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   controllers: [AuthController],
-  providers: [],
+  providers: [AuthGuard],
   imports: [
     ClientsModule.register([
       {
@@ -17,5 +18,6 @@ import { NATS_SERVICE } from 'src/common/enums/service.enums';
       },
     ]),
   ],
+  exports: [AuthGuard],
 })
 export class AuthModule {}

@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { TeamsController } from './teams.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Module({
   controllers: [TeamsController],
-  providers: [],
+  providers: [AuthGuard],
   imports: [
     ClientsModule.register([
       {
