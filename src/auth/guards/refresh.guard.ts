@@ -11,7 +11,7 @@ import { firstValueFrom } from 'rxjs';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class RefreshToken implements CanActivate {
   constructor(
     @Inject(NATS_SERVICE.NATS_SERVICE) private readonly client: ClientProxy,
   ) {}
@@ -23,22 +23,19 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException();
     }
-
     try {
-      const { user } = await firstValueFrom(
-        this.client.send('auth.verify.user', token),
+      const { accessToken, refreshToken } = await firstValueFrom(
+        this.client.send('auth.refresh.token', token),
       );
-
-      request['user'] = user;
-      request['accessToken'] = token;
-      return true;
+      request['token'] = accessToken;
+      request['refreshToken'] = refreshToken;
     } catch {
       throw new UnauthorizedException();
     }
+    return true;
   }
 
   private extractTokenFromCookies(request: Request): string | undefined {
-    console.log('request.cookies', request.cookies?.['accessToken']);
-    return request.cookies?.['accessToken'];
+    return request.cookies?.['refreshToken'];
   }
 }

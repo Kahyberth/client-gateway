@@ -8,10 +8,12 @@ import {
   Res,
   HttpStatus,
   Param,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { firstValueFrom, catchError } from 'rxjs';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
@@ -46,17 +48,25 @@ export class AuthController {
         ),
       );
 
-      const { token } = result;
+      const { accessToken, refreshToken } = result;
 
-      res.cookie('token', token, {
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+        maxAge: 15 * 60 * 1000,
+      });
+
+      res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: false,
         sameSite: 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: '/',
       });
 
-      return res.status(HttpStatus.OK).json({ data: result.data, token });
+      return res
+        .status(HttpStatus.OK)
+        .json({ data: result.data, accessToken, refreshToken });
     } catch (error) {
       return res
         .status(HttpStatus.UNAUTHORIZED)
@@ -64,7 +74,7 @@ export class AuthController {
     }
   }
   @UseGuards(AuthGuard)
-  @Get('verify')
+  @Get('verify-token')
   verifyToken(@User() user: UserInterface) {
     return { user };
   }
@@ -85,15 +95,21 @@ export class AuthController {
     return profile;
   }
 
-  @UseGuards(AuthGuard)
   @Post('logout')
   logout(@Res() res: Response) {
-    res.clearCookie('token', {
+    res.clearCookie('accessToken', {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
       path: '/',
     });
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+    });
+
     return res.status(HttpStatus.OK).json({ success: true });
   }
 
@@ -151,25 +167,30 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  async refreshToken(
-    @Body() body: { refreshToken: string },
-    @Res() res: Response,
-  ) {
-    const result = await firstValueFrom(
-      this.client.send('auth.refresh.token', body).pipe(
-        catchError((err) => {
-          throw new RpcException(err);
-        }),
-      ),
-    );
-    const { accessToken, refreshToken } = result;
-    res.cookie('token', accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+  async refreshToken(@Req() request: Request, @Res() response: Response) {
+    try {
+      const refreshToken =
+        request.cookies?.refreshToken || request.body.refreshToken;
+      if (!refreshToken) {
+        throw new UnauthorizedException('No se encontró el refresh token');
+      }
 
-    return res.status(HttpStatus.OK).json({ accessToken, refreshToken });
+      const tokens = await firstValueFrom(
+        this.client.send('auth.refresh.token', refreshToken),
+      );
+
+      const { accessToken } = tokens;
+
+      response.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: false,
+        maxAge: 15 * 60 * 1000,
+        sameSite: 'lax',
+      });
+
+      return response.status(HttpStatus.OK).json(tokens);
+    } catch {
+      throw new UnauthorizedException();
+    }
   }
 }
