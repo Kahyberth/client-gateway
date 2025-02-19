@@ -16,8 +16,13 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { ExpelMemberDto, InviteUserTeamDto, LeaveTeamDto, TransferLeadershipDto } from './dto';
-
+import {
+  ExpelMemberDto,
+  InvitationTeamDto,
+  InviteUserTeamDto,
+  LeaveTeamDto,
+  TransferLeadershipDto,
+} from './dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -79,7 +84,10 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Delete('delete-team/:teamId')
-  async deleteTeam(@Param('teamId') teamId: string, @Body() payload: { teamId: string, requesterId: string }) {
+  async deleteTeam(
+    @Param('teamId') teamId: string,
+    @Body() payload: { teamId: string; requesterId: string },
+  ) {
     payload.teamId = teamId;
     const result = await firstValueFrom(
       this.client.send('teams.delete.team', payload).pipe(
@@ -91,10 +99,12 @@ export class TeamsController {
     return result;
   }
 
-
   @UseGuards(AuthGuard)
   @Post('invite-user/:teamId')
-  async inviteUser(@Param('teamId') teamId: string, @Body() data: InviteUserTeamDto) {
+  async inviteUser(
+    @Param('teamId') teamId: string,
+    @Body() data: InviteUserTeamDto,
+  ) {
     console.log('teamId', teamId);
     data.teamId = teamId;
     const result = await firstValueFrom(
@@ -123,7 +133,10 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Post('transfer-ownership/:teamId')
-  async transferOwnership(@Param('teamId') teamId: string, @Body() data: TransferLeadershipDto) {
+  async transferOwnership(
+    @Param('teamId') teamId: string,
+    @Body() data: TransferLeadershipDto,
+  ) {
     data.teamId = teamId;
     const result = await firstValueFrom(
       this.client.send('teams.transfer.leadership', data).pipe(
@@ -149,7 +162,7 @@ export class TeamsController {
     );
     return result;
   }
-  
+
   @UseGuards(AuthGuard)
   @Get('get-members-by-team/:teamId')
   async getMembersByTeam(@Param('teamId') teamId: string) {
@@ -178,11 +191,71 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Post('expel-member/:teamId')
-  async expelMember(@Param('teamId') teamId: string, @Body() data: ExpelMemberDto) {
+  async expelMember(
+    @Param('teamId') teamId: string,
+    @Body() data: ExpelMemberDto,
+  ) {
     data.teamId = teamId;
     const result = await firstValueFrom(
       this.client.send('teams.expel.member', data).pipe(
         catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      ),
+    );
+    return result;
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('generate-invite-link/:teamId')
+  async generateInviteLink(
+    @Param('teamId') teamId: string,
+    @Body() data: InvitationTeamDto,
+  ) {
+    data.teamId = teamId;
+    const result = await firstValueFrom(
+      this.client.send('teams.invite.user.by.email', data).pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      ),
+    );
+    return result;
+  }
+
+
+  @Post('accept-invite')
+  async acceptInvite(@Body() payload: { token: string; userId: string }) {
+    const result = await firstValueFrom(
+      this.client.send('teams.accept.invitation', payload).pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      ),
+    );
+    return result;
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('get-invite-link/:teamId')
+  async getInviteLink(@Param('teamId') teamId: string) {
+    const result = await firstValueFrom(
+      this.client.send('teams.get.invite.link', teamId).pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      ),
+    );
+    return result;
+  }
+
+  @Post('validate-invite-link')
+  async validateInviteLink(@Body('token') token: string) {
+      
+    const result = await firstValueFrom(
+      this.client.send('teams.verify.invitation', token).pipe(
+        catchError((err) => {
+          console.log(err);
           throw new InternalServerErrorException(err);
         }),
       ),
