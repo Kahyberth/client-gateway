@@ -16,7 +16,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { InviteUserTeamDto, LeaveTeamDto, TransferLeadershipDto } from './dto';
+import { ExpelMemberDto, InviteUserTeamDto, LeaveTeamDto, TransferLeadershipDto } from './dto';
 
 
 @Controller('teams')
@@ -136,11 +136,13 @@ export class TeamsController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('get-team-by-user/:userId')
+  @Get('get-team-by-user/:userId')
   async getTeamByUser(@Param('userId') userId: string) {
+    console.log('userId', userId);
     const result = await firstValueFrom(
-      this.client.send('teams.get.team.by.user', userId).pipe(
+      this.client.send('teams.by.user', userId).pipe(
         catchError((err) => {
+          console.log(err);
           throw new InternalServerErrorException(err);
         }),
       ),
@@ -149,10 +151,10 @@ export class TeamsController {
   }
   
   @UseGuards(AuthGuard)
-  @Post('get-members-by-team/:teamId')
+  @Get('get-members-by-team/:teamId')
   async getMembersByTeam(@Param('teamId') teamId: string) {
     const result = await firstValueFrom(
-      this.client.send('teams.get.members.by.team', teamId).pipe(
+      this.client.send('teams.members.by.team', teamId).pipe(
         catchError((err) => {
           throw new InternalServerErrorException(err);
         }),
@@ -162,10 +164,10 @@ export class TeamsController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('get-teams-by-id/:teamIds')
-  async getTeamsById(@Param('teamIds') teamIds: string) {
+  @Get('get-team-by-id/:teamId')
+  async getTeamsById(@Param('teamId') teamId: string) {
     const result = await firstValueFrom(
-      this.client.send('teams.get.team.by.id', teamIds).pipe(
+      this.client.send('teams.by.id', teamId).pipe(
         catchError((err) => {
           throw new InternalServerErrorException(err);
         }),
@@ -176,9 +178,10 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Post('expel-member/:teamId')
-  async expelMember(@Param('teamId') teamId: string, @Body() data: any) {
+  async expelMember(@Param('teamId') teamId: string, @Body() data: ExpelMemberDto) {
+    data.teamId = teamId;
     const result = await firstValueFrom(
-      this.client.send('teams.expel.member', { teamId, data }).pipe(
+      this.client.send('teams.expel.member', data).pipe(
         catchError((err) => {
           throw new InternalServerErrorException(err);
         }),
