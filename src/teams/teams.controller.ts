@@ -229,6 +229,7 @@ export class TeamsController {
     const result = await firstValueFrom(
       this.client.send('teams.accept.invitation', payload).pipe(
         catchError((err) => {
+          console.log(err);
           throw new InternalServerErrorException(err);
         }),
       ),
@@ -251,7 +252,6 @@ export class TeamsController {
 
   @Post('validate-invite-link')
   async validateInviteLink(@Body('token') token: string) {
-      
     const result = await firstValueFrom(
       this.client.send('teams.verify.invitation', token).pipe(
         catchError((err) => {
