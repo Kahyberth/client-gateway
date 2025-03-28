@@ -36,6 +36,7 @@ export class TeamsController {
     const result = await firstValueFrom(
       this.client.send('teams.create.team', team).pipe(
         catchError((err) => {
+          console.log(err);
           throw new InternalServerErrorException(err);
         }),
       ),
