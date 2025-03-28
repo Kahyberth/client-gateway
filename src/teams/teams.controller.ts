@@ -226,7 +226,7 @@ export class TeamsController {
 
 
   @Post('accept-invite')
-  async acceptInvite(@Body() payload: { token: string; inviteeEmail: string }) {
+  async acceptInvite(@Body() payload: { token: string; inviteeEmail: string; roleInTeam: string }) {
     
     const result = await firstValueFrom(
       this.client.send('teams.accept.invitation', payload).pipe(

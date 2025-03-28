@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { AuthGuard } from './guards/auth.guard';
+import { envs } from 'src/common/envs/envs';
 
 @Module({
   controllers: [AuthController],
@@ -13,7 +14,7 @@ import { AuthGuard } from './guards/auth.guard';
         name: NATS_SERVICE.NATS_SERVICE,
         transport: Transport.NATS,
         options: {
-          servers: ['nats://localhost:4222'],
+          servers: envs.NATS_SERVERS,
         },
       },
     ]),

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import * as express from 'express';
 
 import { AppModule } from './app.module';
 import { ExceptionFilter } from './common/exceptions/rpc-exception.filter';
@@ -29,6 +30,9 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new ExceptionFilter());
   app.use(cookieParser());
+
+  app.use(express.json({ limit: '2mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '2mb' }));
   await app.listen(3009);
   logger.log(`Gateway running on port ${envs.PORT}`);
 }
