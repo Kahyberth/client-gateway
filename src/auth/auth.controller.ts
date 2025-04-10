@@ -47,14 +47,17 @@ export class AuthController {
           }),
         ),
       );
-
+      const EIGHT_DAYS = 8 * 24 * 60 * 60 * 1000;
       const { accessToken, refreshToken } = result;
+
+      console.log('Access Token:', accessToken);
+      console.log('Refresh Token:', refreshToken);
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: false,
         sameSite: 'strict',
-        maxAge: 15 * 60 * 1000,
+        maxAge: EIGHT_DAYS,
       });
 
       res.cookie('refreshToken', refreshToken, {
@@ -73,6 +76,8 @@ export class AuthController {
         .json({ error, message: 'Invalid credentials' });
     }
   }
+
+  
   @UseGuards(AuthGuard)
   @Get('verify-token')
   verifyToken(@User() user: UserInterface) {
@@ -169,15 +174,17 @@ export class AuthController {
   @Post('refresh-token')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
     try {
+      
+      console.log('Se realizo la peticion de refresh token');
+
       const refreshToken =
         request.cookies?.refreshToken || request.body.refreshToken;
-      if (!refreshToken) {
+      
+        if (!refreshToken) {
         throw new UnauthorizedException('No se encontró el refresh token');
       }
 
-      const tokens = await firstValueFrom(
-        this.client.send('auth.refresh.token', refreshToken),
-      );
+      const tokens = await firstValueFrom(this.client.send('auth.refresh.token', refreshToken));
 
       const { accessToken } = tokens;
 

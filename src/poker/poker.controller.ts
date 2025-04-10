@@ -10,9 +10,10 @@ import {
 import { CreatePokerDto } from './dto/create-poker.dto';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { catchError } from 'rxjs';
+import { catchError, map } from 'rxjs';
 import { ValidateSession } from './dto/validate-session.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { EstimationDto } from './dto/estimation.dto';
 
 @Controller('poker')
 export class PokerController {
@@ -96,6 +97,20 @@ export class PokerController {
         });
       }),
     );
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('ai-estimation')
+  aiEstimation(@Body() data: EstimationDto) {
+    return this.client.send('poker.ai.estimation', data).pipe(
+      catchError((err) => {
+        console.error('Error from microservice:', err);
+        throw new BadRequestException({
+          message: err?.error || 'An error occurred',
+          statusCode: err?.code || 400,
+        });
+      }),
+    )
   }
 
   @Get('stories')

@@ -25,9 +25,13 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const { user } = await firstValueFrom(
+      const { user, valid:isValidToken  } = await firstValueFrom(
         this.client.send('auth.verify.user', token),
       );
+
+      if (!isValidToken) {
+        throw new UnauthorizedException();
+      }
 
       request['user'] = user;
       request['accessToken'] = token;
