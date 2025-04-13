@@ -6,6 +6,8 @@ import {
   Get,
   BadRequestException,
   UseGuards,
+  Param,
+  Query,
 } from '@nestjs/common';
 import { CreatePokerDto } from './dto/create-poker.dto';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
@@ -113,6 +115,22 @@ export class PokerController {
     )
   }
 
+
+  @UseGuards(AuthGuard)
+  @Get('session-details')
+  getSessionDetails(@Query('session') id: string) {
+    console.log('Data received:', id);
+    return this.client.send('poker.get.session', id).pipe(
+      catchError((err) => {
+        console.error('Error from microservice:', err);
+        throw new BadRequestException({
+          message: err?.error || 'An error occurred',
+          statusCode: err?.code || 400,
+        });
+      }),
+    )
+  }
+
   @Get('stories')
   findAll() {
     return [
@@ -142,6 +160,8 @@ export class PokerController {
       },
     ];
   }
+
+  
 
   @Get('ping')
   ping() {
