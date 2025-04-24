@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
-
-import { AppModule } from './app.module';
 import { ExceptionFilter } from './common/exceptions/rpc-exception.filter';
+import { AppModule } from './app.module';
 import { envs } from './common/envs/envs';
 
 async function bootstrap() {
@@ -23,17 +23,25 @@ async function bootstrap() {
     credentials: true,
   });
   app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
   app.useGlobalFilters(new ExceptionFilter());
   app.use(cookieParser());
 
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+  const config = new DocumentBuilder()
+    .setTitle('TaskMate RESTFul API')
+    .setDescription('API para todos los microservicios')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('api/docs', app, document);
+
   await app.listen(3009);
+
   logger.log(`Gateway running on port ${envs.PORT}`);
 }
 bootstrap();

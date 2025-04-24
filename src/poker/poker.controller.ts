@@ -9,14 +9,17 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { CreatePokerDto } from './dto/create-poker.dto';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { ApiTags } from '@nestjs/swagger';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, map } from 'rxjs';
+import { CreatePokerDto } from './dto/create-poker.dto';
+import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { ValidateSession } from './dto/validate-session.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { EstimationDto } from './dto/estimation.dto';
 
+
+@ApiTags('Planning Poker')
 @Controller('poker')
 export class PokerController {
   constructor(

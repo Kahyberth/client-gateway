@@ -10,13 +10,13 @@ import {
   InternalServerErrorException,
   Query,
 } from '@nestjs/common';
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { ApiTags } from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom } from 'rxjs';
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { NATS_SERVICE } from 'src/common/enums/service.enums';
 
-
+@ApiTags('Channels')
 @Controller('channels')
 export class ChannelsController {
   constructor(

@@ -11,8 +11,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { ApiTags } from '@nestjs/swagger';
 import { catchError, firstValueFrom } from 'rxjs';
+import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
@@ -24,6 +25,8 @@ import {
   TransferLeadershipDto,
 } from './dto';
 
+
+@ApiTags('Teams')
 @Controller('teams')
 export class TeamsController {
   constructor(
