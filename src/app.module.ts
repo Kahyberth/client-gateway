@@ -4,10 +4,11 @@ import { PokerModule } from './poker/poker.module';
 import { UsersModule } from './users/users.module';
 import { TeamsModule } from './teams/teams.module';
 import { ChannelsModule } from './channels/channels.module';
+import { ProjectsModule } from './projects/projects.module';
 
 
 @Module({
-  imports: [AuthModule, PokerModule, UsersModule, TeamsModule, ChannelsModule,],
+  imports: [AuthModule, PokerModule, UsersModule, TeamsModule, ChannelsModule, ProjectsModule],
   controllers: [],
   providers: [],
 })
