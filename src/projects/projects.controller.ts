@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, Patch, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Patch, Get, Param, InternalServerErrorException } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { ClientProxy } from '@nestjs/microservices';
@@ -15,7 +15,7 @@ export class ProjectsController {
   async create(@Body() createProjectDto: CreateProjectDto) {
     return this.client.send('projects.create.project', createProjectDto).pipe(
       catchError((err) => {
-        throw new RpcException(err);
+        throw new InternalServerErrorException(err);
       }),
     );
   }
@@ -24,7 +24,7 @@ export class ProjectsController {
   async update(@Body() data: any, @Param('id') id: string) {
     return this.client.send('projects.update.project', { id, ...data }).pipe(
       catchError((err) => {
-        throw new RpcException(err);
+        throw new InternalServerErrorException(err);
       }),
     );
   }
@@ -32,11 +32,11 @@ export class ProjectsController {
   @Get('find/:id')
   async findOneProject(@Param('id') id: string) {
     if (!id) {
-      throw new RpcException('Project ID is required');
+      throw new InternalServerErrorException('Project ID is required');
     }
     return this.client.send('projects.findOne.project', id).pipe(
       catchError((err) => {
-        throw new RpcException(err);
+        throw new InternalServerErrorException(err);
       }),
     );
   }
@@ -45,7 +45,7 @@ export class ProjectsController {
   async getAll() {
     return this.client.send('projects.findAll.project', {}).pipe(
       catchError((err) => {
-        throw new RpcException(err);
+        throw new InternalServerErrorException(err);
       }),
     );
   }
