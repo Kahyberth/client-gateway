@@ -158,7 +158,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'The user id provided does not exist or is invalid.'})
   async findUserById(@Param('id') id: string) {
     if (!id) throw new BadRequestException('Id is required');
-
+    console.log('ID:', id);
     const user = await firstValueFrom(
       this.client.send('auth.find.user.by.id', id).pipe(
         catchError((err) => {

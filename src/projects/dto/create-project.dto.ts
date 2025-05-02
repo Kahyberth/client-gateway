@@ -1,20 +1,34 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
-import { Type } from 'class-transformer';
-
+import { IsString, IsOptional, IsArray, IsEnum } from 'class-validator';
 export class CreateProjectDto {
   @IsString()
   name: string;
 
   @IsString()
+  @IsOptional()
   description: string;
 
-  @IsOptional()
-  @Type(() => Date) // 👈 Esto transforma el string a Date
-  @IsDate()
-  startDate: Date;
+  @IsString()
+  created_by: string;
 
+  @IsString()
+  team_id: string;
+
+
+  @IsString({
+    each: true,
+  })
+  @IsArray()
   @IsOptional()
-  @Type(() => Date) // 👈 Esto transforma el string a Date
-  @IsDate()
-  endDate: Date;
+  tags?: string[];
+
+  @IsString()
+  @IsEnum(['SCRUM', 'KANBAN'])
+  type: string;
+
+  @IsString({
+    each: true,
+  })
+  @IsArray()
+  @IsOptional()
+  members?: string[];
 }

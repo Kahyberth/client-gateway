@@ -9,6 +9,8 @@ import {
   Delete,
   UseGuards,
   InternalServerErrorException,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
@@ -49,9 +51,12 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Get('get-all-teams')
-  async getAllTeams() {
+  async getAllTeams(@Query('page') page?: number) {
+    if(!page) {
+      page = 1;
+    }
     const result = await firstValueFrom(
-      this.client.send('teams.get.all.teams', {}).pipe(
+      this.client.send('teams.get.all.teams', page ).pipe(
         catchError((err) => {
           throw new InternalServerErrorException(err);
         }),
@@ -59,6 +64,8 @@ export class TeamsController {
     );
     return result;
   }
+
+
 
   @UseGuards(AuthGuard)
   @Get('get-team/:id')
@@ -154,10 +161,15 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Get('get-team-by-user/:userId')
-  async getTeamByUser(@Param('userId') userId: string) {
-    console.log('userId', userId);
+  async getTeamByUser(@Param('userId') userId: string, @Query('page') page?: number) {
+    if(!page) {
+      page = 1;
+    }
+    if(!userId) {
+      throw new BadRequestException('User ID is required');
+    }
     const result = await firstValueFrom(
-      this.client.send('teams.by.user', userId).pipe(
+      this.client.send('teams.by.user', { userId, page }).pipe(
         catchError((err) => {
           console.log(err);
           throw new InternalServerErrorException(err);
@@ -169,9 +181,12 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Get('get-members-by-team/:teamId')
-  async getMembersByTeam(@Param('teamId') teamId: string) {
+  async getMembersByTeam(@Param('teamId') teamId: string, @Query('page') page?: number) {
+    if(!page) {
+      page = 1;
+    }
     const result = await firstValueFrom(
-      this.client.send('teams.members.by.team', teamId).pipe(
+      this.client.send('teams.paginate.members.by.team', { teamId, page }).pipe(
         catchError((err) => {
           throw new InternalServerErrorException(err);
         }),
