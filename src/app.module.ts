@@ -5,11 +5,20 @@ import { UsersModule } from './users/users.module';
 import { TeamsModule } from './teams/teams.module';
 import { ChannelsModule } from './channels/channels.module';
 import { ProjectsModule } from './projects/projects.module';
-import { IssuesModule } from './auth/issues/issues.module';
-
+import { IssuesModule } from './issues/issues.module';
+import { EpicsModule } from './epics/epics.module';
 
 @Module({
-  imports: [AuthModule, PokerModule, UsersModule, TeamsModule, ChannelsModule, ProjectsModule, IssuesModule],
+  imports: [
+    AuthModule,
+    PokerModule,
+    UsersModule,
+    TeamsModule,
+    ChannelsModule,
+    ProjectsModule,
+    IssuesModule,
+    EpicsModule
+  ],
   controllers: [],
   providers: [],
 })

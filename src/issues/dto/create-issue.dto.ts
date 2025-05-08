@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsInt, Min, Max, IsBoolean } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsInt, Min, IsBoolean, IsUUID } from 'class-validator';
 
 export enum Priority {
   LOW = 'low',
@@ -51,10 +51,10 @@ export class CreateIssueDto {
   @IsOptional()
   story_points?: number | null;
 
-  @IsString()
+  @IsUUID()
   createdBy: string;
 
-  @IsString()
+  @IsUUID()
   @IsOptional()
   assignedTo: string;
 
@@ -62,6 +62,10 @@ export class CreateIssueDto {
   @IsOptional()
   isDeleted?: boolean;
 
-  @IsString()
-  product_backlog: string;
+  @IsUUID()
+  productBacklogId: string;
+
+  @IsUUID()
+  @IsOptional()
+  epicId?: string;
 }
