@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   InternalServerErrorException,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
@@ -26,6 +28,52 @@ export class BacklogController {
       .send('product-backlog.addIssueToBacklog', {
         createIssueDto,
         productBacklogId,
+      })
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
+
+  @Get('get-all-issues/:id')
+  async getAllIssues(
+    @Param('id') backlogId: string,
+    @Query('filters') filters: { status?: string },
+  ) {
+    return this.client
+      .send('product-backlog.getBacklogIssues', {
+        backlogId,
+        filters,
+      })
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
+
+  @Get('get-backlog/:id')
+  async getBacklog(@Param('id') backlogId: string) {
+    return this.client
+      .send('product-backlog.getProductBacklog', {
+        backlogId,
+      })
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
+
+  @Get('get-backlog-by-project/:id')
+  async getBacklogByProject(@Param('id') projectId: string) {
+    return this.client
+      .send('product-backlog.getProductBacklogByProjectId', {
+        projectId,
       })
       .pipe(
         catchError((err) => {
