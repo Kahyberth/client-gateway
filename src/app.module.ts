@@ -6,10 +6,11 @@ import { TeamsModule } from './teams/teams.module';
 import { ChannelsModule } from './channels/channels.module';
 import { ProjectsModule } from './projects/projects.module';
 import { IssuesModule } from './auth/issues/issues.module';
+import { BacklogModule } from './backlog/backlog.module';
 
 
 @Module({
-  imports: [AuthModule, PokerModule, UsersModule, TeamsModule, ChannelsModule, ProjectsModule, IssuesModule],
+  imports: [AuthModule, PokerModule, UsersModule, TeamsModule, ChannelsModule, ProjectsModule, IssuesModule, BacklogModule],
   controllers: [],
   providers: [],
 })

@@ -1,9 +1,17 @@
-import { Controller, Post, Body, Inject, Patch, Get, Param, InternalServerErrorException } from '@nestjs/common';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  InternalServerErrorException,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
-import { RpcException } from '@nestjs/microservices';
+import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { CreateProjectDto } from './dto/create-project.dto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -19,7 +27,7 @@ export class ProjectsController {
       }),
     );
   }
-  
+
   @Patch('update/:id')
   async update(@Body() data: any, @Param('id') id: string) {
     return this.client.send('projects.update.project', { id, ...data }).pipe(
