@@ -8,7 +8,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Module({
   controllers: [IssuesController],
-  providers: [],
+  providers: [AuthGuard],
   imports: [
     ClientsModule.register([
       {
