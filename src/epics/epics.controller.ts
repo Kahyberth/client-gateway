@@ -1,19 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  Put,
+  Get,
   Inject,
+  Param,
+  Patch,
+  Post,
+  ParseUUIDPipe
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { CreateEpicDto } from './dto/create-epic.dto';
 import { UpdateEpicDto } from './dto/update-epic.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Epics')
 @Controller('epics')
@@ -54,7 +55,7 @@ export class EpicsController {
   @ApiResponse({ status: 404, description: 'Epic no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @Get('get-epic/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.client.send('epics.findOne', id).pipe(
       catchError((err) => {
         throw new RpcException(err);
@@ -67,8 +68,8 @@ export class EpicsController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 404, description: 'Epic no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
-  @Put('update')
-  update(@Body() updateEpicDto: UpdateEpicDto) {
+  @Patch('update')
+  async update(@Body() updateEpicDto: UpdateEpicDto) {
     return this.client.send('epics.update', updateEpicDto).pipe(
       catchError((err) => {
         throw new RpcException(err);
@@ -82,7 +83,7 @@ export class EpicsController {
   @ApiResponse({ status: 404, description: 'Epic no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @Delete('delete-epic/:id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.client.send('epics.remove', id).pipe(
       catchError((err) => {
         throw new RpcException(err);

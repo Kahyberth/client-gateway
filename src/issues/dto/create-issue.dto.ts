@@ -49,7 +49,7 @@ export class CreateIssueDto {
   @IsInt()
   @Min(1)
   @IsOptional()
-  story_points?: number | null;
+  storyPoints?: number | null;
 
   @IsUUID()
   createdBy: string;
