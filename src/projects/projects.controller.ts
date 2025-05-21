@@ -12,6 +12,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { InviteMemberDto } from './dto/invite-member.dto';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -86,7 +87,7 @@ export class ProjectsController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @Get('findByUser/:userId')
   async getProjectsByUser(@Param('userId') userId: string) {
-    console.log('userId', userId);
+    console.log('Fetching projects for userId:', userId);
     if (!userId) {
       throw new RpcException({
         status: 400,
@@ -95,6 +96,7 @@ export class ProjectsController {
     }
     return this.client.send('projects.findByUser.project', userId).pipe(
       catchError((err) => {
+        console.error('Error fetching projects for user:', err);
         throw new RpcException(err);
       }),
     );
@@ -222,5 +224,22 @@ export class ProjectsController {
     }
     
     return secondInitial ? `${firstInitial}${secondInitial}` : firstInitial;
+  }
+
+  @ApiOperation({ summary: 'Invitar miembro a un proyecto' })
+  @ApiResponse({ status: 201, description: 'Invitación enviada exitosamente' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
+  @ApiResponse({ status: 409, description: 'El usuario ya es miembro del proyecto' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @Post('invite-member')
+  async inviteMember(@Body() inviteMemberDto: InviteMemberDto) {
+    console.log('Sending invitation to project member:', inviteMemberDto);
+    return this.client.send('projects.invite.member', inviteMemberDto).pipe(
+      catchError((err) => {
+        console.error('Error inviting member:', err);
+        throw new RpcException(err);
+      }),
+    );
   }
 }

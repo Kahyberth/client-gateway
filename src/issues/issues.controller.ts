@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Inject, Delete, ParseUUIDPipe, Put, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Inject, Delete, ParseUUIDPipe, Put, UseGuards, Patch } from "@nestjs/common";
 import { CreateIssueDto } from "./dto/create-issue.dto";
 import { UpdateIssueDto } from "./dto/update-issue.dto";
 import { CreateCommentDto } from "./dto/create-comment.dto";
@@ -52,7 +52,7 @@ export class IssuesController {
   @ApiResponse({ status: 404, description: 'Issue no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @UseGuards(AuthGuard)
-  @Put('update')
+  @Patch('update')
   async update(@Body() updateIssueDto: UpdateIssueDto) {
     return this.client.send('issue.update', updateIssueDto).pipe(
       catchError((err) => {
