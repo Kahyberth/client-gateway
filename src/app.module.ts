@@ -8,6 +8,7 @@ import { PokerModule } from './poker/poker.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
+import { SprintsModule } from './sprints/sprints.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UsersModule } from './users/users.module';
     IssuesModule,
     EpicsModule,
     BacklogModule,
+    SprintsModule,
   ],
   controllers: [],
   providers: [],

@@ -36,16 +36,21 @@ export class EpicsController {
   }
 
   @ApiOperation({ summary: 'Obtener epics por product backlog' })
-  @ApiResponse({ status: 200, description: 'Lista de epics obtenida exitosamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de epics obtenida exitosamente',
+  })
   @ApiResponse({ status: 400, description: 'ID de product backlog inválido' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @Get('get-by-backlog/:productBacklogId')
   findByProductBacklog(@Param('productBacklogId') productBacklogId: string) {
-    return this.client.send('epics.findByProductBacklog', productBacklogId).pipe(
-      catchError((err) => {
-        throw new RpcException(err);
-      }),
-    );
+    return this.client
+      .send('epics.findByProductBacklog', productBacklogId)
+      .pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      );
   }
 
   @ApiOperation({ summary: 'Obtener un epic por ID' })
@@ -89,4 +94,4 @@ export class EpicsController {
       }),
     );
   }
-} 
+}

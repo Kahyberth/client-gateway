@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { Controller, Get, Post, Body, Param, Inject, Delete, ParseUUIDPipe, Put, UseGuards } from "@nestjs/common";
 import { CreateIssueDto } from "./dto/create-issue.dto";
 import { UpdateIssueDto } from "./dto/update-issue.dto";
@@ -9,6 +10,26 @@ import { catchError } from "rxjs";
 import { RpcException } from "@nestjs/microservices";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+=======
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Inject,
+  Delete,
+  ParseUUIDPipe,
+  Put,
+  Patch,
+} from '@nestjs/common';
+import { CreateIssueDto } from './dto/create-issue.dto';
+import { UpdateIssueDto } from './dto/update-issue.dto';
+import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { ClientProxy } from '@nestjs/microservices';
+import { catchError } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
+>>>>>>> Stashed changes
 
 @ApiTags('Issues')
 @Controller('issues')
@@ -104,6 +125,7 @@ export class IssuesController {
     );
   }
 
+<<<<<<< Updated upstream
   @ApiOperation({ summary: 'Crear un nuevo comentario' })
   @ApiResponse({ status: 201, description: 'Comentario creado exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
@@ -112,11 +134,20 @@ export class IssuesController {
   @Post('create-comment')
   async createComment(@Body() createCommentDto: CreateCommentDto) {
     return this.client.send('issues.create.comment', createCommentDto).pipe(
+=======
+  @Patch('update/status/:id')
+  async updateStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('newStatus') newStatus: string,
+  ) {
+    return this.client.send('issues.update.status', { id, newStatus }).pipe(
+>>>>>>> Stashed changes
       catchError((err) => {
         throw new RpcException(err);
       }),
     );
   }
+<<<<<<< Updated upstream
 
   @ApiOperation({ summary: 'Obtener comentarios por issue' })
   @ApiResponse({ status: 200, description: 'Lista de comentarios obtenida exitosamente' })
@@ -166,3 +197,6 @@ export class IssuesController {
     );
   }
 }
+=======
+}
+>>>>>>> Stashed changes

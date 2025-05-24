@@ -82,4 +82,34 @@ export class BacklogController {
         }),
       );
   }
+
+  @Post('move-issue-to-sprint')
+  async moveIssueToSprint(
+    @Query('issueId') issueId: string,
+    @Query('sprintId') sprintId: string,
+  ) {
+    return this.client
+      .send('product-backlog.moveIssueToSprint', { issueId, sprintId })
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
+
+  @Post('move-issue-to-backlog')
+  async moveIssueToBacklog(
+    @Query('issueId') issueId: string,
+    @Query('productBacklogId') productBacklogId: string,
+  ) {
+    return this.client
+      .send('product-backlog.moveIssueToBacklog', { issueId, productBacklogId })
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
 }

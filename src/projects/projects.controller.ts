@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -76,5 +77,35 @@ export class ProjectsController {
         throw new InternalServerErrorException(err);
       }),
     );
+  }
+
+  @Get('findAllByUser')
+  async findAllProjectsByUser(
+    @Query('userId') userId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.client
+      .send('projects.findAllByUser.project', { userId, page, limit })
+      .pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
+
+  @Get('members/:projectId')
+  async getProjectMembersPaginated(
+    @Param('projectId') projectId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.client
+      .send('projects.members.paginated', { projectId, page, limit })
+      .pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      );
   }
 }
