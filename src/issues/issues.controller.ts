@@ -11,6 +11,7 @@ import {
   Patch,
   UseGuards,
   Query,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
@@ -191,6 +192,23 @@ export class IssuesController {
     return this.client.send('issues.update.comment', payload).pipe(
       catchError((err) => {
         throw new RpcException(err);
+      }),
+    );
+  }
+
+  @ApiOperation({ summary: 'Obtener issues por epic' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de issues obtenida exitosamente',
+  })
+  @ApiResponse({ status: 400, description: 'ID de epic inválido' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
+  @Get('by-epic/:epicId')
+  async findByEpic(@Param('epicId', ParseUUIDPipe) epicId: string) {
+    return this.client.send('issues.by-epic', epicId).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
       }),
     );
   }

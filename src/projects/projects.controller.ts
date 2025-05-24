@@ -9,7 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
@@ -99,7 +99,6 @@ export class ProjectsController {
       );
   }
 
-  //TODO: Refactorizar código
   @ApiOperation({ summary: 'Obtener miembros de un proyecto' })
   @ApiResponse({
     status: 200,
@@ -109,95 +108,32 @@ export class ProjectsController {
   @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @Get('members/:projectId')
-  async getProjectMembers(@Param('projectId') projectId: string) {
-    if (!projectId) {
-      throw new RpcException({
-        status: 400,
-        message: 'Project ID is required',
-      });
-    }
-
-    try {
-      const members = await this.client
-        .send('projects.getMembers', projectId)
-        .pipe(
-          catchError((err) => {
-            throw new RpcException(err);
-          }),
-        )
-        .toPromise();
-
-      if (!members) {
-        throw new RpcException({
-          status: 404,
-          message: 'No members found for this project',
-        });
-      }
-
-      // Obtenemos los datos de usuario para cada miembro
-      const membersWithDetails = await Promise.all(
-        members.map(async (member: any) => {
-          try {
-            const userDetails = await this.client
-              .send('auth.find.user.by.id', member.user_id)
-              .pipe(
-                catchError((err) => {
-                  console.error(
-                    `Error fetching user details for ${member.user_id}:`,
-                    err,
-                  );
-                  return null;
-                }),
-              )
-              .toPromise();
-
-            return {
-              ...member,
-              user: userDetails,
-              initials: userDetails
-                ? this.getInitials(userDetails.name, userDetails.lastName)
-                : 'U',
-            };
-          } catch (error) {
-            console.error(`Error processing member ${member.user_id}:`, error);
-            return {
-              ...member,
-              user: null,
-              initials: 'U',
-            };
-          }
+  async getProjectMembers(
+    @Param('projectId') projectId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.client
+      .send('projects.members.paginated', { projectId, page, limit })
+      .pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
         }),
       );
-
-      return membersWithDetails;
-    } catch (error) {
-      console.error(`Error fetching project members for ${projectId}:`, error);
-      if (error instanceof RpcException) {
-        throw error;
-      }
-      throw new RpcException({
-        status: 500,
-        message: 'Error fetching project members',
-      });
-    }
   }
 
-  // Función auxiliar para generar iniciales a partir del nombre
-  private getInitials(firstName: string, lastName?: string): string {
-    if (!firstName) return 'U';
-
-    const firstInitial = firstName.charAt(0).toUpperCase();
-    let secondInitial = '';
-
-    if (lastName && lastName.length > 0) {
-      secondInitial = lastName.charAt(0).toUpperCase();
-    } else if (firstName.includes(' ')) {
-      const nameParts = firstName.split(' ');
-      if (nameParts.length > 1 && nameParts[1].length > 0) {
-        secondInitial = nameParts[1].charAt(0).toUpperCase();
-      }
-    }
-
-    return secondInitial ? `${firstInitial}${secondInitial}` : firstInitial;
+  @Get('team-members/unassigned')
+  async getMembersByTeamNotInProject(
+    @Query('teamId') teamId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.client
+      .send('projects.members.not.in.project', { teamId, page, limit })
+      .pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      );
   }
 }
