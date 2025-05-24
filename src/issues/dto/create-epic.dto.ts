@@ -8,7 +8,7 @@ export class CreateEpicDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(['review', 'to-do', 'in-progress', 'resolved', 'closed'])
+  @IsEnum(['review', 'to-do', 'in-progress', 'done', 'closed'])
   @IsOptional()
   status?: string;
 

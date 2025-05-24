@@ -7,6 +7,8 @@ import {
   Param,
   Post,
   Query,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
@@ -39,20 +41,35 @@ export class BacklogController {
 
   @Get('get-all-issues/:id')
   async getAllIssues(
-    @Param('id') backlogId: string,
-    @Query('filters') filters: { status?: string },
+    @Param('id') id: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('search') search?: string,
   ) {
-    return this.client
-      .send('product-backlog.getBacklogIssues', {
-        backlogId,
-        filters,
-      })
-      .pipe(
-        catchError((err) => {
-          console.log(err);
-          throw new InternalServerErrorException(err);
-        }),
+    try {
+      console.log(`Getting all issues for backlog ${id} with page ${page}, limit ${limit}, search ${search}`);
+      return this.client
+        .send('product-backlog.getBacklogIssues', {
+          backlogId: id,
+          filters: {
+            page: page ? Number(page) : undefined,
+            limit: limit ? Number(limit) : undefined,
+            search: search || ''
+          },
+        })
+        .pipe(
+          catchError((err) => {
+            console.log(err);
+            throw new InternalServerErrorException(err);
+          }),
+        );
+    } catch (error) {
+      console.error('Error getting all issues:', error);
+      throw new HttpException(
+        'Failed to get issues',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
   }
 
   @Get('get-backlog/:id')
@@ -73,6 +90,22 @@ export class BacklogController {
   async getBacklogByProject(@Param('id') projectId: string) {
     return this.client
       .send('product-backlog.getProductBacklogByProjectId', {
+        projectId,
+      })
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
+
+  @Get('project-stats/:id')
+  async getProjectStats(@Param('id') projectId: string) {
+    console.log(`Gateway: fetching project stats for project: ${projectId}`);
+    
+    return this.client
+      .send('product-backlog.getProjectStats', {
         projectId,
       })
       .pipe(

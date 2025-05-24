@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsInt, Min, IsBoolean, IsUUID } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsInt, Min, IsBoolean, IsUUID, IsNumber } from 'class-validator';
 
 export enum Priority {
   LOW = 'low',
@@ -11,7 +11,7 @@ export enum Status {
   REVIEW = 'review',
   TODO = 'to-do',
   IN_PROGRESS = 'in-progress',
-  RESOLVED = 'resolved',
+  DONE = 'done',
   CLOSED = 'closed'
 }
 
@@ -46,8 +46,7 @@ export class CreateIssueDto {
   @IsOptional()
   acceptanceCriteria: string;
 
-  @IsInt()
-  @Min(1)
+  @IsNumber()
   @IsOptional()
   storyPoints?: number | null;
 

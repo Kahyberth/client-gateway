@@ -3,9 +3,11 @@ import {
   Controller,
   Get,
   Inject,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -100,6 +102,25 @@ export class ProjectsController {
         throw new RpcException(err);
       }),
     );
+  }
+  
+  @ApiOperation({ summary: 'Obtener proyectos por ID de usuario con paginación' })
+  @ApiResponse({ status: 200, description: 'Lista de proyectos obtenida exitosamente con paginación' })
+  @ApiResponse({ status: 400, description: 'ID de usuario inválido o página inválida' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @Get('findAllByUser')
+  async findAllProjectsByUser(
+    @Query('userId') userId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.client
+      .send('projects.findAllByUser.project', { userId, page, limit })
+      .pipe(
+        catchError((err) => {
+          throw new InternalServerErrorException(err);
+        }),
+      );
   }
 
   @ApiOperation({ summary: 'Obtener issues del backlog de un proyecto' })

@@ -54,6 +54,7 @@ export class IssuesController {
   @UseGuards(AuthGuard)
   @Patch('update')
   async update(@Body() updateIssueDto: UpdateIssueDto) {
+    console.log("Updating issue:", updateIssueDto);
     return this.client.send('issue.update', updateIssueDto).pipe(
       catchError((err) => {
         throw new RpcException(err);
@@ -70,6 +71,21 @@ export class IssuesController {
   @Delete('delete/:id')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.client.send('issue.remove', id).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
+  }
+
+  @ApiOperation({ summary: 'Obtener issues por epic' })
+  @ApiResponse({ status: 200, description: 'Lista de issues obtenida exitosamente' })
+  @ApiResponse({ status: 400, description: 'ID de epic inválido' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
+  @Get('by-epic/:epicId')
+  async findByEpic(@Param('epicId', ParseUUIDPipe) epicId: string) {
+    console.log("Fetching issues by epic:", epicId);
+    return this.client.send('issues.by-epic', epicId).pipe(
       catchError((err) => {
         throw new RpcException(err);
       }),
