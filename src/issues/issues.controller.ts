@@ -10,6 +10,7 @@ import {
   Put,
   Patch,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
@@ -66,13 +67,18 @@ export class IssuesController {
   @ApiResponse({ status: 404, description: 'Issue no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   @UseGuards(AuthGuard)
-  @Put('update')
-  async update(@Body() updateIssueDto: UpdateIssueDto) {
-    return this.client.send('issue.update', updateIssueDto).pipe(
-      catchError((err) => {
-        throw new RpcException(err);
-      }),
-    );
+  @Patch('update')
+  async update(
+    @Query('id') id: string,
+    @Body() updateIssueDto: UpdateIssueDto,
+  ) {
+    return this.client
+      .send('issue.update', { id, updateDto: updateIssueDto })
+      .pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        }),
+      );
   }
 
   @ApiOperation({ summary: 'Eliminar un issue por ID' })

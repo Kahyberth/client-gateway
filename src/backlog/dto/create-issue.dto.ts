@@ -4,6 +4,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
 } from 'class-validator';
 
@@ -63,9 +64,13 @@ export class CreateIssueDto {
 
   @IsString()
   @IsOptional()
-  assignedTo: string;
+  assignedTo?: string;
 
   @IsBoolean()
   @IsOptional()
   isDeleted?: boolean;
+
+  @IsUUID()
+  @IsOptional()
+  epicId?: string;
 }
