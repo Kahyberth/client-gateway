@@ -14,6 +14,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
 import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { InviteMemberDto } from './dto/invite-member.dto';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -122,6 +123,20 @@ export class ProjectsController {
       );
   }
 
+  @ApiOperation({ summary: 'Invitar un miembro a un proyecto' })
+  @ApiResponse({ status: 200, description: 'Miembro invitado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @Post('invite-member')
+  async inviteMember(@Body() payload: InviteMemberDto) {
+    return this.client.send('projects.invite.member', payload).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
+      }),
+    );
+  }
+
+  
   @Get('team-members/unassigned')
   async getMembersByTeamNotInProject(
     @Query('teamId') teamId: string,
