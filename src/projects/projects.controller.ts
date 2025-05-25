@@ -140,11 +140,12 @@ export class ProjectsController {
   @Get('team-members/unassigned')
   async getMembersByTeamNotInProject(
     @Query('teamId') teamId: string,
+    @Query('projectId') projectId: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
     return this.client
-      .send('projects.members.not.in.project', { teamId, page, limit })
+      .send('projects.members.not.in.project', { teamId, projectId, page, limit })
       .pipe(
         catchError((err) => {
           throw new InternalServerErrorException(err);
