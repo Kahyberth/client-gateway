@@ -1,29 +1,28 @@
 import {
-  Controller,
-  Post,
-  Body,
-  Inject,
-  Get,
-  UseGuards,
-  Res,
-  HttpStatus,
-  Param,
-  Req,
-  UnauthorizedException,
   BadRequestException,
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Param,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { firstValueFrom, catchError } from 'rxjs';
-import { Response, Request } from 'express';
+import { Request, Response } from 'express';
+import { catchError, firstValueFrom } from 'rxjs';
 
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
-import { LoginDto } from './dto/login-auth.dto';
+import { NATS_SERVICE } from '../common/nats.interface';
 import { User } from './decorators';
-import { UserInterface } from './interfaces/user.interfaces';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { LoginDto } from './dto/login-auth.dto';
 import { AuthGuard } from './guards/auth.guard';
-
+import { UserInterface } from './interfaces/user.interfaces';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -33,8 +32,11 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  @ApiResponse({ status: 201, description: 'A new user was created successfully.'})
-  @ApiResponse({ status: 400, description: 'Duplicate/Incomplete Values'})
+  @ApiResponse({
+    status: 201,
+    description: 'A new user was created successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Duplicate/Incomplete Values' })
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.client.send('auth.register.user', createAuthDto).pipe(
       catchError((err) => {
@@ -44,8 +46,11 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiResponse({ status: 200, description: 'The user has entered the data successfully.'})
-  @ApiResponse({ status: 400, description: 'Incomplete Values'})
+  @ApiResponse({
+    status: 200,
+    description: 'The user has entered the data successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Incomplete Values' })
   async login(@Body() login: LoginDto, @Res() res: Response) {
     try {
       const result = await firstValueFrom(
@@ -85,19 +90,27 @@ export class AuthController {
     }
   }
 
-  
   @UseGuards(AuthGuard)
   @Get('verify-token')
-  @ApiResponse({ status: 200, description: 'Token successfully verified'})
-  @ApiResponse({ status: 400, description: 'The token has expired or is invalid.'})
+  @ApiResponse({ status: 200, description: 'Token successfully verified' })
+  @ApiResponse({
+    status: 400,
+    description: 'The token has expired or is invalid.',
+  })
   verifyToken(@User() user: UserInterface) {
     return { user };
   }
 
   @UseGuards(AuthGuard)
   @Get('profile/:id')
-  @ApiResponse({ status: 200, description: 'Profile information successfully uploaded'})
-  @ApiResponse({ status: 400, description: 'The ID does not exist or has expired.'})
+  @ApiResponse({
+    status: 200,
+    description: 'Profile information successfully uploaded',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'The ID does not exist or has expired.',
+  })
   async profile(@Param('id') id: string) {
     const profile = await firstValueFrom(
       this.client.send('auth.get.profile', id).pipe(
@@ -113,8 +126,14 @@ export class AuthController {
   }
 
   @Post('logout')
-  @ApiResponse({ status: 200, description: 'User has successfully closed session'})
-  @ApiResponse({ status: 400, description: 'Error when trying to close the session'})
+  @ApiResponse({
+    status: 200,
+    description: 'User has successfully closed session',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Error when trying to close the session',
+  })
   logout(@Res() res: Response) {
     res.clearCookie('accessToken', {
       httpOnly: true,
@@ -133,8 +152,11 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @ApiResponse({ status: 200, description: 'Mail found successfully'})
-  @ApiResponse({ status: 400, description: 'The email provided does not exist or is invalid.'})
+  @ApiResponse({ status: 200, description: 'Mail found successfully' })
+  @ApiResponse({
+    status: 400,
+    description: 'The email provided does not exist or is invalid.',
+  })
   @Get('find/:email')
   async findUserByEmail(@Param('email') email: string) {
     if (!email) throw new BadRequestException('Email is required');
@@ -154,8 +176,11 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('find/user/:id')
-  @ApiResponse({ status: 200, description: 'User successfully found'})
-  @ApiResponse({ status: 400, description: 'The user id provided does not exist or is invalid.'})
+  @ApiResponse({ status: 200, description: 'User successfully found' })
+  @ApiResponse({
+    status: 400,
+    description: 'The user id provided does not exist or is invalid.',
+  })
   async findUserById(@Param('id') id: string) {
     if (!id) throw new BadRequestException('Id is required');
     console.log('ID:', id);
@@ -174,8 +199,11 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('find/:token')
-  @ApiResponse({ status: 200, description: 'The token provided is valid'})
-  @ApiResponse({ status: 400, description: 'The token does not exist or has expired.'})
+  @ApiResponse({ status: 200, description: 'The token provided is valid' })
+  @ApiResponse({
+    status: 400,
+    description: 'The token does not exist or has expired.',
+  })
   async findUser(@Param('token') token: string) {
     token = token.split('=')[1];
     const user = await firstValueFrom(
@@ -192,21 +220,25 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @ApiResponse({ status: 200, description: 'The token provided is valid'})
-  @ApiResponse({ status: 400, description: 'The token does not exist or has expired.'})
+  @ApiResponse({ status: 200, description: 'The token provided is valid' })
+  @ApiResponse({
+    status: 400,
+    description: 'The token does not exist or has expired.',
+  })
   async refreshToken(@Req() request: Request, @Res() response: Response) {
     try {
-      
       console.log('Se realizo la peticion de refresh token');
 
       const refreshToken =
         request.cookies?.refreshToken || request.body.refreshToken;
-      
-        if (!refreshToken) {
+
+      if (!refreshToken) {
         throw new UnauthorizedException('No se encontró el refresh token');
       }
 
-      const tokens = await firstValueFrom(this.client.send('auth.refresh.token', refreshToken));
+      const tokens = await firstValueFrom(
+        this.client.send('auth.refresh.token', refreshToken),
+      );
 
       const { accessToken } = tokens;
 

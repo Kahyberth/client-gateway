@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { NATS_SERVICE } from 'src/common/nats.interface';
 import { CreateIssueDto } from './dto/create-issue.dto';
 
 @Controller('backlog')

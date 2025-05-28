@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { EpicsController } from './epics.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { NATS_SERVICE } from 'src/common/nats.interface';
 
 @Module({
   controllers: [EpicsController],
@@ -18,4 +17,4 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
     ]),
   ],
 })
-export class EpicsModule {} 
+export class EpicsModule {}

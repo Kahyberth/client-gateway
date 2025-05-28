@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { NATS_SERVICE } from 'src/common/nats.interface';
 import { envs } from 'src/common/envs/envs';
 import { BacklogController } from './backlog.controller';
 

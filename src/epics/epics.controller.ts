@@ -1,19 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  Put,
+  Get,
   Inject,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { NATS_SERVICE } from 'src/common/nats.interface';
 import { CreateEpicDto } from './dto/create-epic.dto';
 import { UpdateEpicDto } from './dto/update-epic.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Epics')
 @Controller('epics')

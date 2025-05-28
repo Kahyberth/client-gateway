@@ -1,3 +1,4 @@
+import 'tsconfig-paths/register';
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -23,7 +24,7 @@ async function bootstrap() {
     credentials: true,
   });
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true}),
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
   app.useGlobalFilters(new ExceptionFilter());
   app.use(cookieParser());

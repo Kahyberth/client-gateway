@@ -1,0 +1,7 @@
+export interface NATS_SERVICE_INTERFACE {
+  NATS_SERVICE: string;
+}
+
+export const NATS_SERVICE: NATS_SERVICE_INTERFACE = {
+  NATS_SERVICE: 'NATS_SERVICE',
+};

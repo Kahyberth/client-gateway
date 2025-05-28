@@ -1,16 +1,16 @@
 import {
-  Controller,
-  Post,
   Body,
-  InternalServerErrorException,
-  Inject,
+  Controller,
   Get,
+  Inject,
+  InternalServerErrorException,
+  Post,
   Query,
 } from '@nestjs/common';
-import { CreateSprintDto } from './dto/create-sprint.dto';
-import { catchError } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { catchError } from 'rxjs';
+import { NATS_SERVICE } from 'src/common/nats.interface';
+import { CreateSprintDto } from './dto/create-sprint.dto';
 
 @Controller('sprints')
 export class SprintsController {
