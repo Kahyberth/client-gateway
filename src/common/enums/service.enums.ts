@@ -1,7 +1,0 @@
-export enum NATS_SERVICE {
-  NATS_SERVICE = 'NATS_SERVICE',
-}
-
-export enum AUTH_SERVICE {
-  AUTH_SERVICE = 'AUTH_SERVICE',
-}

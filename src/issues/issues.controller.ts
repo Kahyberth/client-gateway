@@ -1,30 +1,27 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
-  Inject,
+  Controller,
   Delete,
-  ParseUUIDPipe,
-  Put,
-  Patch,
-  UseGuards,
-  Query,
+  Get,
+  Inject,
   InternalServerErrorException,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateIssueDto } from './dto/create-issue.dto';
-import { UpdateIssueDto } from './dto/update-issue.dto';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
-import { RpcException } from '@nestjs/microservices';
-import { ApiOperation } from '@nestjs/swagger';
-import { ApiResponse } from '@nestjs/swagger';
-import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { NATS_SERVICE } from 'src/common/nats.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UpdateIssueDto } from './dto/update-issue.dto';
 
 @ApiTags('Issues')
 @Controller('issues')

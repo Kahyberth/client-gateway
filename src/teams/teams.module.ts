@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TeamsController } from './teams.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
+import { NATS_SERVICE } from 'src/common/nats.interface';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @Module({

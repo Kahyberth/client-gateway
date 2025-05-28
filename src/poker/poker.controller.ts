@@ -1,23 +1,21 @@
 import {
-  Controller,
-  Post,
-  Body,
-  Inject,
-  Get,
   BadRequestException,
-  UseGuards,
-  Param,
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { catchError, map } from 'rxjs';
-import { CreatePokerDto } from './dto/create-poker.dto';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
-import { ValidateSession } from './dto/validate-session.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { catchError } from 'rxjs';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { NATS_SERVICE } from 'src/common/nats.interface';
+import { CreatePokerDto } from './dto/create-poker.dto';
 import { EstimationDto } from './dto/estimation.dto';
-
+import { ValidateSession } from './dto/validate-session.dto';
 
 @ApiTags('Planning Poker')
 @Controller('poker')
@@ -115,9 +113,8 @@ export class PokerController {
           statusCode: err?.code || 400,
         });
       }),
-    )
+    );
   }
-
 
   @UseGuards(AuthGuard)
   @Get('session-details')
@@ -131,7 +128,7 @@ export class PokerController {
           statusCode: err?.code || 400,
         });
       }),
-    )
+    );
   }
 
   @Get('stories')
@@ -163,8 +160,6 @@ export class PokerController {
       },
     ];
   }
-
-  
 
   @Get('ping')
   ping() {

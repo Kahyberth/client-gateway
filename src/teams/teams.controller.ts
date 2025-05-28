@@ -1,24 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
+  Controller,
+  Delete,
+  Get,
   Inject,
+  InternalServerErrorException,
   Param,
   Patch,
-  Delete,
-  UseGuards,
-  InternalServerErrorException,
+  Post,
   Query,
-  BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
 import { catchError, firstValueFrom } from 'rxjs';
-import { NATS_SERVICE } from 'src/common/enums/service.enums';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
+import { NATS_SERVICE } from 'src/common/nats.interface';
 import {
   ExpelMemberDto,
   InvitationTeamDto,
@@ -26,7 +24,8 @@ import {
   LeaveTeamDto,
   TransferLeadershipDto,
 } from './dto';
-
+import { CreateTeamDto } from './dto/create-team.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
 
 @ApiTags('Teams')
 @Controller('teams')
@@ -52,11 +51,11 @@ export class TeamsController {
   @UseGuards(AuthGuard)
   @Get('get-all-teams')
   async getAllTeams(@Query('page') page?: number) {
-    if(!page) {
+    if (!page) {
       page = 1;
     }
     const result = await firstValueFrom(
-      this.client.send('teams.get.all.teams', page ).pipe(
+      this.client.send('teams.get.all.teams', page).pipe(
         catchError((err) => {
           throw new InternalServerErrorException(err);
         }),
@@ -64,8 +63,6 @@ export class TeamsController {
     );
     return result;
   }
-
-
 
   @UseGuards(AuthGuard)
   @Get('get-team/:id')
@@ -161,11 +158,14 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Get('get-team-by-user/:userId')
-  async getTeamByUser(@Param('userId') userId: string, @Query('page') page?: number) {
-    if(!page) {
+  async getTeamByUser(
+    @Param('userId') userId: string,
+    @Query('page') page?: number,
+  ) {
+    if (!page) {
       page = 1;
     }
-    if(!userId) {
+    if (!userId) {
       throw new BadRequestException('User ID is required');
     }
     const result = await firstValueFrom(
@@ -181,8 +181,11 @@ export class TeamsController {
 
   @UseGuards(AuthGuard)
   @Get('get-members-by-team/:teamId')
-  async getMembersByTeam(@Param('teamId') teamId: string, @Query('page') page?: number) {
-    if(!page) {
+  async getMembersByTeam(
+    @Param('teamId') teamId: string,
+    @Query('page') page?: number,
+  ) {
+    if (!page) {
       page = 1;
     }
     const result = await firstValueFrom(
@@ -242,10 +245,15 @@ export class TeamsController {
     return result;
   }
 
-
   @Post('accept-invite')
-  async acceptInvite(@Body() payload: { token: string; inviteeEmail: string; roleInTeam: string }) {
-    
+  async acceptInvite(
+    @Body()
+    payload: {
+      token: string;
+      inviteeEmail: string;
+      roleInTeam: string;
+    },
+  ) {
     const result = await firstValueFrom(
       this.client.send('teams.accept.invitation', payload).pipe(
         catchError((err) => {
@@ -282,5 +290,4 @@ export class TeamsController {
     );
     return result;
   }
-
 }
