@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ChannelsController } from './channels.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { NATS_SERVICE } from '../common/nats.interface';
+import { envs } from '../common/envs/envs';
 
 @Module({
   controllers: [ChannelsController],
@@ -12,10 +13,11 @@ import { NATS_SERVICE } from 'src/common/nats.interface';
         name: NATS_SERVICE.NATS_SERVICE,
         transport: Transport.NATS,
         options: {
-          url: 'nats://localhost:4222',
+          url: envs.NATS_SERVERS,
         },
       },
     ]),
   ],
+  exports: [],
 })
 export class ChannelsModule {}

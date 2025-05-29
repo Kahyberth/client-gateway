@@ -11,7 +11,7 @@ import {
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { NATS_SERVICE } from '../common/nats.interface';
 import { CreateEpicDto } from './dto/create-epic.dto';
 import { UpdateEpicDto } from './dto/update-epic.dto';
 

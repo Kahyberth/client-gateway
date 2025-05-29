@@ -15,8 +15,8 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
 import { catchError, firstValueFrom } from 'rxjs';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { NATS_SERVICE } from '../common/nats.interface';
 import {
   ExpelMemberDto,
   InvitationTeamDto,

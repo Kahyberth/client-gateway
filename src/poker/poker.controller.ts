@@ -11,8 +11,8 @@ import {
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { NATS_SERVICE } from '../common/nats.interface';
 import { CreatePokerDto } from './dto/create-poker.dto';
 import { EstimationDto } from './dto/estimation.dto';
 import { ValidateSession } from './dto/validate-session.dto';

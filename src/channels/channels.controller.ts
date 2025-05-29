@@ -11,7 +11,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
 import { catchError, firstValueFrom } from 'rxjs';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { NATS_SERVICE } from '../common/nats.interface';
 import { CreateChannelDto } from './dto/create-channel.dto';
 
 @ApiTags('Channels')
