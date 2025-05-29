@@ -70,6 +70,7 @@ export class IssuesController {
     @Query('id') id: string,
     @Body() updateIssueDto: UpdateIssueDto,
   ) {
+    console.log("Updating issue:", id, updateIssueDto)
     return this.client
       .send('issue.update', { id, updateDto: updateIssueDto })
       .pipe(

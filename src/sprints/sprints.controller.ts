@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   Post,
   Query,
+  Param,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
@@ -17,6 +18,15 @@ export class SprintsController {
   constructor(
     @Inject(NATS_SERVICE.NATS_SERVICE) private readonly client: ClientProxy,
   ) {}
+
+  @Get('get-sprints-by-project/:projectId')
+  getProjectSprints(@Param('projectId') projectId: string) {
+    return this.client.send('sprints.get.project_sprints', { projectId }).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
+      }),
+    );
+  }
 
   @Post('create')
   create(@Body() createSprintDto: CreateSprintDto) {

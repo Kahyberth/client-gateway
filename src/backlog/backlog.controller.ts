@@ -112,4 +112,18 @@ export class BacklogController {
         }),
       );
   }
+
+  @Get('project-stats/:id')
+  async getProjectStats(@Param('id') projectId: string) {
+    return this.client
+      .send('product-backlog.getProjectStats', {
+        projectId,
+      })
+      .pipe(
+        catchError((err) => {
+          console.log(err);
+          throw new InternalServerErrorException(err);
+        }),
+      );
+  }
 }
