@@ -16,8 +16,8 @@ import {
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { catchError } from 'rxjs';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { NATS_SERVICE } from '../common/nats.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';

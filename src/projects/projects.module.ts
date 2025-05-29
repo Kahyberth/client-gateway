@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { NATS_SERVICE } from '../common/nats.interface';
 
-import { envs } from 'src/common/envs/envs';
+import { envs } from '../common/envs/envs';
 import { ProjectsController } from './projects.controller';
 
 @Module({

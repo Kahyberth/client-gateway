@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
-import { NATS_SERVICE } from 'src/common/nats.interface';
+import { NATS_SERVICE } from '../common/nats.interface';
 import { CreateSprintDto } from './dto/create-sprint.dto';
 
 @Controller('sprints')
