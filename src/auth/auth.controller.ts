@@ -68,16 +68,18 @@ export class AuthController {
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: true,
+        sameSite: 'none',
         maxAge: EIGHT_DAYS,
+        domain: process.env.COOKIE_DOMAIN || undefined,
       });
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: true,
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        domain: process.env.COOKIE_DOMAIN || undefined,
       });
 
       return res
@@ -244,14 +246,24 @@ export class AuthController {
 
       response.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
+        sameSite: 'none',
         maxAge: 15 * 60 * 1000,
-        sameSite: 'lax',
+        domain: process.env.COOKIE_DOMAIN || undefined,
       });
 
       return response.status(HttpStatus.OK).json(tokens);
     } catch {
       throw new UnauthorizedException();
     }
+  }
+
+  @Get('ping')
+  ping() {
+    return this.client.send('auth.ping', '').pipe(
+      catchError((err) => {
+        throw new BadRequestException(err);
+      }),
+    );
   }
 }

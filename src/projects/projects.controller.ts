@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   InternalServerErrorException,
+  BadRequestException,
   Param,
   Patch,
   Post,
@@ -152,4 +153,15 @@ export class ProjectsController {
         }),
       );
   }
+
+
+  @Get('ping')
+  ping() {
+    return this.client.send('projects.ping', '').pipe(
+      catchError((err) => {
+        throw new BadRequestException(err);
+      }),
+    );
+  }
+
 }

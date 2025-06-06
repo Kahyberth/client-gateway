@@ -164,6 +164,10 @@ export class PokerController {
   @Get('ping')
   ping() {
     console.log('Pinging...');
-    return 'pong';
+    return this.client.send('poker.ping', '').pipe(
+      catchError((err) => {
+        throw new BadRequestException(err);
+      }),
+    );
   }
 }
