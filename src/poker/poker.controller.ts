@@ -131,6 +131,22 @@ export class PokerController {
     );
   }
 
+
+  @Get('session-details-by-project-id')
+  getSessionDetailsByProjectId(@Query('project_id') project_id: string) {
+    return this.client.send('poker.get.session.by.project.id', project_id).pipe(
+      catchError((err) => {
+        throw new BadRequestException({
+          message: err?.error || 'An error occurred',
+          statusCode: err?.code || 400,
+        });
+      }),
+    );
+  }
+
+
+  
+
   @Get('stories')
   findAll() {
     return [

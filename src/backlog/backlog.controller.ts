@@ -23,11 +23,13 @@ export class BacklogController {
   async addIssueToBacklog(
     @Body() createIssueDto: CreateIssueDto,
     @Param('id') productBacklogId: string,
+    @Query('epicId') epicId?: string, 
   ) {
     return this.client
       .send('product-backlog.addIssueToBacklog', {
         createIssueDto,
         productBacklogId,
+        epicId,
       })
       .pipe(
         catchError((err) => {

@@ -152,4 +152,19 @@ export class ProjectsController {
         }),
       );
   }
+
+
+  @ApiOperation({ summary: 'Obtener proyectos de un equipo' })
+  @ApiResponse({ status: 200, description: 'Proyectos obtenidos exitosamente' })
+  @ApiResponse({ status: 400, description: 'ID del equipo inválido' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @Get('team-projects')
+  async getProjectsByTeam(@Query('teamId') teamId: string) {
+    return this.client.send('projects.get.projects.by.team', teamId).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
+      }),
+    );
+  }
+
 }
