@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -21,6 +22,7 @@ import { NATS_SERVICE } from '../common/nats.interface';
 import { User } from './decorators';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login-auth.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { UserInterface } from './interfaces/user.interfaces';
 
@@ -253,5 +255,18 @@ export class AuthController {
     } catch {
       throw new UnauthorizedException();
     }
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('profile/update')
+  @ApiResponse({ status: 200, description: 'Profile successfully updated' })
+  @ApiResponse({ status: 400, description: 'Invalid profile data' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async updateProfile(@Body() updateProfileDto: UpdateProfileDto) {
+    return this.client.send('auth.update.profile', updateProfileDto).pipe(
+      catchError((err) => {
+        throw new BadRequestException(err);
+      }),
+    );
   }
 }

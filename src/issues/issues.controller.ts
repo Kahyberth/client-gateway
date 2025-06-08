@@ -211,6 +211,23 @@ export class IssuesController {
     );
   }
 
+  @ApiOperation({ summary: 'Obtener issues por proyecto' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de issues obtenida exitosamente',
+  })
+  @ApiResponse({ status: 400, description: 'ID de proyecto inválido' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
+  @Get('by-project/:projectId')
+  async findByProject(@Param('projectId', ParseUUIDPipe) projectId: string) {
+    return this.client.send('issues.by.project', projectId).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
+      }),
+    );
+  }
+
   @ApiOperation({ summary: 'Eliminar un comentario por ID' })
   @ApiResponse({
     status: 200,

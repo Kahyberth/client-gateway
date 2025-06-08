@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   InternalServerErrorException,
@@ -15,6 +16,7 @@ import { catchError } from 'rxjs';
 import { NATS_SERVICE } from '../common/nats.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { InviteMemberDto } from './dto/invite-member.dto';
+import { RemoveMemberDto } from './dto/remove-member.dto';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -64,6 +66,20 @@ export class ProjectsController {
       throw new InternalServerErrorException('Project ID is required');
     }
     return this.client.send('projects.findOne.project', id).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
+      }),
+    );
+  }
+
+  @ApiOperation({ summary: 'Eliminar un proyecto por ID' })
+  @ApiResponse({ status: 200, description: 'Proyecto eliminado exitosamente' })
+  @ApiResponse({ status: 400, description: 'ID inválido' })
+  @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @Delete('delete/:id')
+  async delete(@Param('id') id: string) {
+    return this.client.send('projects.delete.project', id).pipe(
       catchError((err) => {
         throw new InternalServerErrorException(err);
       }),
@@ -151,6 +167,19 @@ export class ProjectsController {
           throw new InternalServerErrorException(err);
         }),
       );
+  }
+
+  @ApiOperation({ summary: 'Eliminar un miembro de un proyecto' })
+  @ApiResponse({ status: 200, description: 'Miembro eliminado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @Delete('remove-member')
+  async removeMember(@Body() payload: RemoveMemberDto) {
+    return this.client.send('projects.remove.member', payload).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
+      }),
+    );
   }
 
 
