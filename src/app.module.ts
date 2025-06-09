@@ -9,6 +9,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
 import { SprintsModule } from './sprints/sprints.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -22,6 +23,14 @@ import { SprintsModule } from './sprints/sprints.module';
     EpicsModule,
     BacklogModule,
     SprintsModule,
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 3000,
+          limit: 3,
+        },
+      ],
+    })
   ],
   controllers: [],
   providers: [],
