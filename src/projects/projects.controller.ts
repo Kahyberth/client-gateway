@@ -19,7 +19,7 @@ import { NATS_SERVICE } from '../common/nats.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { InviteMemberDto } from './dto/invite-member.dto';
 import { RemoveMemberDto } from './dto/remove-member.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AuthGuard } from '../auth/guards/auth.guard'
 
 @ApiTags('Projects')
 @Controller('projects')
