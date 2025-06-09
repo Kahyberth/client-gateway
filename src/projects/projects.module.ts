@@ -4,6 +4,7 @@ import { NATS_SERVICE } from '../common/nats.interface';
 
 import { envs } from '../common/envs/envs';
 import { ProjectsController } from './projects.controller';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   controllers: [ProjectsController],
@@ -18,6 +19,7 @@ import { ProjectsController } from './projects.controller';
         },
       },
     ]),
+    AuthModule,
   ],
   exports: [],
 })

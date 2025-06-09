@@ -9,6 +9,8 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -17,6 +19,7 @@ import { NATS_SERVICE } from '../common/nats.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { InviteMemberDto } from './dto/invite-member.dto';
 import { RemoveMemberDto } from './dto/remove-member.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 @ApiTags('Projects')
 @Controller('projects')
@@ -29,6 +32,7 @@ export class ProjectsController {
   @ApiResponse({ status: 201, description: 'Proyecto creado exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Post('create')
   async create(@Body() createProjectDto: CreateProjectDto) {
     return this.client.send('projects.create.project', createProjectDto).pipe(
@@ -46,6 +50,7 @@ export class ProjectsController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Patch('update/:id')
   async update(@Body() data: any, @Param('id') id: string) {
     return this.client.send('projects.update.project', { id, ...data }).pipe(
@@ -60,6 +65,7 @@ export class ProjectsController {
   @ApiResponse({ status: 400, description: 'ID inválido' })
   @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Get('find/:id')
   async findOneProject(@Param('id') id: string) {
     if (!id) {
@@ -77,6 +83,7 @@ export class ProjectsController {
   @ApiResponse({ status: 400, description: 'ID inválido' })
   @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: string) {
     return this.client.send('projects.delete.project', id).pipe(
@@ -92,6 +99,7 @@ export class ProjectsController {
     description: 'Lista de proyectos obtenida exitosamente',
   })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Get('findAll')
   async getAll() {
     return this.client.send('projects.findAll.project', {}).pipe(
@@ -102,6 +110,7 @@ export class ProjectsController {
   }
 
   @Get('findAllByUser')
+  @UseGuards(AuthGuard)
   async findAllProjectsByUser(
     @Query('userId') userId: string,
     @Query('page') page: number = 1,
@@ -124,6 +133,7 @@ export class ProjectsController {
   @ApiResponse({ status: 400, description: 'ID del proyecto inválido' })
   @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Get('members/:projectId')
   async getProjectMembers(
     @Param('projectId') projectId: string,
@@ -143,6 +153,7 @@ export class ProjectsController {
   @ApiResponse({ status: 200, description: 'Miembro invitado exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Post('invite-member')
   async inviteMember(@Body() payload: InviteMemberDto) {
     return this.client.send('projects.invite.member', payload).pipe(
@@ -154,6 +165,7 @@ export class ProjectsController {
 
   
   @Get('team-members/unassigned')
+  @UseGuards(AuthGuard)
   async getMembersByTeamNotInProject(
     @Query('teamId') teamId: string,
     @Query('projectId') projectId: string,
@@ -173,6 +185,7 @@ export class ProjectsController {
   @ApiResponse({ status: 200, description: 'Miembro eliminado exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Delete('remove-member')
   async removeMember(@Body() payload: RemoveMemberDto) {
     return this.client.send('projects.remove.member', payload).pipe(
@@ -182,11 +195,25 @@ export class ProjectsController {
     );
   }
 
+  @Post('ai-response')
+  @UseGuards(AuthGuard)
+  async getAIResponse(@Body() payload: { query: string; userId: string }) {
+    console.log('Sending payload to microservice:', payload); 
+    if (!payload.query) {
+      throw new BadRequestException('Query is required');
+    }
+    return this.client.send('get-ai-response', payload).pipe(
+      catchError((err) => {
+        throw new InternalServerErrorException(err);
+      }),
+    );
+  }
 
   @ApiOperation({ summary: 'Obtener proyectos de un equipo' })
   @ApiResponse({ status: 200, description: 'Proyectos obtenidos exitosamente' })
   @ApiResponse({ status: 400, description: 'ID del equipo inválido' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  @UseGuards(AuthGuard)
   @Get('team-projects')
   async getProjectsByTeam(@Query('teamId') teamId: string) {
     return this.client.send('projects.get.projects.by.team', teamId).pipe(
@@ -195,5 +222,4 @@ export class ProjectsController {
       }),
     );
   }
-
 }
